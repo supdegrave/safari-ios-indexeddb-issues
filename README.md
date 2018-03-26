@@ -2,7 +2,7 @@
 
 [Demo on StackBlitz](https://angular-bvndmy.stackblitz.io)
 
-This page was built to demonstrate instability in the implementation of IndexedDB in Safari/iOS (iPad 2, iOS 11.2.6 (15D100)), which can be seen either by pushing data too rapidly, or by pushing too much data. 
+This Angular application was built to demonstrate instability in the implementation of IndexedDB in Safari/iOS (specifically: iPad 2, iOS 11.2.6 (15D100)), which can be seen either by pushing data too rapidly, or by pushing too much data. 
 
 _Unfortunately, this results in the application's IndexedDB data being lost._
 
