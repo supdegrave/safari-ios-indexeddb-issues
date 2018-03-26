@@ -1,0 +1,27 @@
+* {
+  font-family: Lato;
+}
+
+button {
+  cursor: pointer;
+  border: solid 1px lightgray;
+  border-radius: 5px;
+  background-color: white;
+  padding: 10px;
+  font-size: 100%;
+  display: block;
+  margin-bottom: 0.5em;
+  width: 120px;
+}
+button.clear {
+  width: auto;
+}
+button:disabled {
+  cursor: not-allowed;
+}
+
+span {
+  display: inline-block;
+  text-align: center;
+  padding: 0 5px;
+}
