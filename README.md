@@ -1,28 +1,26 @@
-# angular-bvndmy
+# Safari iOS - IndexedDB instability
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.2.1.
+This page was built to demonstrate instability in the implementation of IndexedDB in Safari/iOS (iPad 2, iOS 11.2.6 (15D100)), which can be seen either by pushing data too rapidly, or by pushing too much data. 
 
-## Development server
+_Unfortunately, this results in the application's IndexedDB data being lost._
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+---
 
-## Code scaffolding
+### Implementation
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|module`.
+* Create strings of random size > 1MB, until reaching execution size. 
+* In immediate mode, push each into an array, then loop the array to insert.
+* In interval mode, insert on timer (bypassing the intermediate array).
 
-## Build
+---
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
+The crash results in a forced page reload, displaying a header with "This web page was reloaded because a problem occurred."
 
-## Running unit tests
+This reload is silent and can't be easily tracked.
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+* If debugging on a USB-connected computer, the Safari debugger window disappears on page reload.
+* Nothing appears in the device logs (as seen in XCode) since it doesn't cause an actual app crash.
 
-## Running end-to-end tests
+On my device, the page almost always crashes if I add as little as 100MB without interval. It always crashes if I add 500MB with any interval between writes. Repeatedly adding 100MB or 250MB with various intervals eventually crashes.
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-Before running the tests make sure you are serving the app via `ng serve`.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+[GitHub](https://github.com/supdegrave/safari-ios-indexeddb-issues)
