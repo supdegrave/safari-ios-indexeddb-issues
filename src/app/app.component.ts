@@ -21,13 +21,23 @@ export class AppComponent implements OnInit {
   floodStart: Date;
   floodEnd: Date;
   statusHistory: string[] = [];
-  buttonsDisabled = true;
+  buttonsDisabled: boolean = true;
+
+  dataSizes: number[] = [100, 250, 500, 1024];
+  intervalSizes: number[] = [0, 100, 200, 500];
+
+  dataSize: number;
+  intervalSize: number;
+
+  get insertDisabled() {
+    return (this.dataSize === undefined && this.intervalSize === undefined) || this.buttonsDisabled;
+  }
 
   get floodDuration() {
     const diff = (this.floodEnd.getTime() - this.floodStart.getTime()) / 1000;
     return Math.abs(diff);
   }
-  
+
   constructor(private idb: IndexedDbService) {
     idb.setName(this._dbName);
     idb.initializeObjectStores([this._storeName]);
@@ -47,23 +57,24 @@ export class AppComponent implements OnInit {
       );
   }
 
-  floodIdb(sizeInMB: number, interval?: number) {
+  insertDataClick() {
+    const sizeInMB = this.dataSize;
+    const interval = this.intervalSize;
+    const status = `Adding ${sizeInMB}MB ${interval > 0 ? `with ${interval}ms` : 'without'} interval`;
+
     this.buttonsDisabled = true;
     this.floodStart = new Date();
     this.floodEnd = null;
-    
-    const status = `Adding ${sizeInMB}MB ${interval ? `with ${interval}ms interval` : ''}`;
     this.status = status;
     this.statusHistory.push(status);
 
     setTimeout(() => {
-      const sizeInBytes = sizeInMB * 1024 * 1024; 
+      const sizeInBytes = sizeInMB * 1024 * 1024;
 
-      if (interval) {
-        console.log(interval);
-        this.intervalFlood(sizeInBytes, interval);
+      if (interval > 0) {
+        this.intervalInsert(sizeInBytes, interval);
       } else {
-        this.blastFlood(sizeInBytes);
+        this.blastInsert(sizeInBytes);
       }
     }, 500);
   }
@@ -91,9 +102,17 @@ export class AppComponent implements OnInit {
     dbReq.onerror = () => console.error(dbReq.error);
   }
 
-  private intervalFlood(sizeInBytes: number, intval: number) {
+  dataChanged(event) {
+    this.dataSize = event.target.selectedOptions[0].value;
+  }
+
+  intervalChanged(event) {
+    this.intervalSize = event.target.selectedOptions[0].value;
+  }
+
+  private intervalInsert(sizeInBytes: number, intval: number) {
     let sizeOfRun: number = 0;
-    
+
     interval(intval).pipe(
       takeWhile(() => sizeOfRun < sizeInBytes),
       concatMap((next) => {
@@ -102,12 +121,12 @@ export class AppComponent implements OnInit {
         sizeOfRun += chunkSize;
         this.currentDbSize += chunk.length;
         const key = new Date().getTime().toString();
-        return this.idb.put(this._storeName, key, chunk)        
+        return this.idb.put(this._storeName, key, chunk)
       })
     ).subscribe(this.floodObserver);
   }
 
-  private blastFlood(sizeInBytes: number) {
+  private blastInsert(sizeInBytes: number) {
     let sizeOfRun: number = 0;
     const chunks = [];
     let chunkSize;
