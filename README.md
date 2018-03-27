@@ -25,3 +25,4 @@ This reload is silent and can't be easily tracked.
 
 On my device, the page almost always crashes if I add as little as 100MB without interval. It always crashes if I add 500MB with any interval between writes. Repeatedly adding 100MB or 250MB with various intervals eventually crashes.
 
+[Browser comparison (personal laptop)](browser-comparison.md)
